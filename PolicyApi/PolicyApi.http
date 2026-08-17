@@ -1,0 +1,54 @@
+@PolicyApi_HostAddress = http://localhost:5187
+
+### 1. Get a token for Tenant 1 (Acme). Send THIS request first, then send the ones below.
+# @name login
+POST {{PolicyApi_HostAddress}}/api/auth/token
+Content-Type: application/json
+
+{
+  "tenantId": 1
+}
+
+### 2. Happy path - customer 1 (Alice) policy, scoped to Tenant 1 -> 200
+GET {{PolicyApi_HostAddress}}/api/customers/1/policy
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### 3. Expiring policies within 30 days, tenant-scoped -> only Acme policies
+GET {{PolicyApi_HostAddress}}/api/policies/expiring?withinDays=30
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### 4. Bonus - deterministic expiration-date lookup by policy number -> 200
+GET {{PolicyApi_HostAddress}}/api/policies/ACME-1001/expiration-date
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### 5. BLOCKED cross-tenant - customer 3 belongs to Tenant 2, so a Tenant 1 token gets 404
+GET {{PolicyApi_HostAddress}}/api/customers/3/policy
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### 6. No token at all -> 401
+GET {{PolicyApi_HostAddress}}/api/policies/expiring
+
+### 7. Negative withinDays -> 400
+GET {{PolicyApi_HostAddress}}/api/policies/expiring?withinDays=-5
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### 8. Get a token for Tenant 2 (Globex). Send this before request 9.
+# @name loginT2
+POST {{PolicyApi_HostAddress}}/api/auth/token
+Content-Type: application/json
+
+{
+  "tenantId": 2
+}
+
+### 9. Tenant 2 sees its OWN customer 3 policy -> 200 (the same id Tenant 1 could not see)
+GET {{PolicyApi_HostAddress}}/api/customers/3/policy
+Authorization: Bearer {{loginT2.response.body.$.accessToken}}
+
+### 10. Token request for an unknown tenant -> 404
+POST {{PolicyApi_HostAddress}}/api/auth/token
+Content-Type: application/json
+
+{
+  "tenantId": 999
+}
