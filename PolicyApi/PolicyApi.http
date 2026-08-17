@@ -29,7 +29,7 @@ Authorization: Bearer {{login.response.body.$.accessToken}}
 GET {{PolicyApi_HostAddress}}/api/policies/expiring
 
 ### 7. Negative withinDays -> 400
-GET {{PolicyApi_HostAddress}}/api/policies/expiring?withinDays=-5
+GET {{PolicyApi_HostAddress}}/api/policies/expiring?withinDays=30
 Authorization: Bearer {{login.response.body.$.accessToken}}
 
 ### 8. Get a token for Tenant 2 (Globex). Send this before request 9.

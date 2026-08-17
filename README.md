@@ -4,7 +4,12 @@ An ASP.NET Core (minimal API) service on **.NET 10**, **EF Core 10** then **SQL 
 
 ## How to run
 
-Prerequisites: .NET 10 SDK plus SQL Server LocalDB (the `MSSQLLocalDB` instance).
+Built with **Visual Studio 2026** (.NET 10 workload).
+
+Prerequisites:
+
+- **.NET 10 SDK**.
+- **SQL Server LocalDB** - the `MSSQLLocalDB` instance. It is included with Visual Studio's ".NET desktop / Data storage and processing" workload, so a typical Visual Studio install already has it. On a plain editor like VS Code, install it separately via the SQL Server Express / LocalDB installer then run `sqllocaldb create MSSQLLocalDB`. Verify with `sqllocaldb info`.
 
 ```bash
 dotnet restore
